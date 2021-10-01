@@ -1,90 +1,44 @@
 import logo from './logo.svg';
 import './App.css';
-import React from 'react';
-import {Query, Mutation } from 'react-apollo';
-import gql from 'graphql-tag';
-
+import React, { useState } from 'react';
+import { Query, Mutation } from 'react-apollo';
+import ProductTileCard from './components/productTile';
+import { useQuery } from "@apollo/react-hooks";
+import gql from "graphql-tag";
+import { PRODUCT_BY_ITEM_KEY, GET_PRODUCTS } from './config/queryConstants';
+import { isEmpty } from './util/utils';
+import ProductRegFrom from './components/prod-reg-form/component';
+import Modal from "@material-ui/core/Modal";
+import { globalBoxStyle } from './config/constants';
+import { Button } from '@material-ui/core';
+import Grid from "@material-ui/core/Grid";
 function App() {
-  const [name, setName] = React.useState('')
+  const [name, setName] = useState('')
+  const { status, data, error, refetch } = useQuery(GET_PRODUCTS)
+  const [showModal, setShowModal] = useState(false);
+  const renderModal = () => {
+    return (showModal == true ? <Modal
+      open={showModal}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    ><ProductRegFrom boxStyle={globalBoxStyle} handleClose={(e) => { refetch(); setShowModal(false); }}></ProductRegFrom></Modal> : <Button color="primary" variant="contained" onClick={(e) => { setShowModal(true) }}>Register Product</Button>)
+  }
+  const renderCard = () => {
+    if (!isEmpty(data) && !isEmpty(data.products)) {
+      return <section className={"paddingTop2"}>
+        {renderModal()}
+        <div className={"displayFlex"}>
+          <Grid container spacing={2}>
+            {data.products.map(prd => <Grid item xs={6} sm={3}><ProductTileCard product={prd} refresh={() => { refetch() }} /></Grid>)}
+          </Grid>
+        </div>
 
-  const CREATE_USER = gql(`
-  mutation createUser($name: String) {
-    createUser(name: $name) {
-      name
+      </section>
+    } else {
+      return "No Products to Display"
     }
   }
-`);
-  const GET_USERS = gql(`
-  query getUsers {
-    users {
-      name
-    }
-  }
-`);
-  const GET_PRODUCTS = gql(`query getProducts{products{itemKey,price,desc,customCut}}`)
-  const createUserHandler = (cache, { data: { createUser } }) => {
-    const { users } = cache.readQuery({ query: GET_USERS });
-    cache.writeQuery({
-      query: GET_USERS,
-      data: { users: users.concat([createUser]) },
-    });
-  };
-
-  const renderSubmitButton = createUser => (
-    <button
-      onClick={() => createUser({ variables: { "name": name } })}
-    >
-      Create
-    </button>
-  );
-
-  const renderContent = (obj) => {
-    console.log("obj",obj)
-    let{ loading, error, data } = obj;
-    if (loading) return <h2>Loading...</h2>;
-    if (error) return <h2>Error</h2>;
-    return (
-      <div>
-        <h2>User List</h2>
-        <input
-          onChange={ev => setName(ev.target.value)}
-          placeholder="New username..."
-          value={name}
-        />
-        <Mutation mutation={CREATE_USER} update={createUserHandler}>
-          {renderSubmitButton}
-        </Mutation>
-        <Mutation mutation={CREATE_USER} update={createUserHandler}>
-          {updateSubmitButton}
-        </Mutation>
-        <ul>
-          {data.users.map((user, index) => (
-            <li key={index}>{user.name}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
-  const renderProducts = (obj) => {
-    let { loading, error, data } = obj;
-    if (loading) return <h2>Loading...</h2>;
-    if (error) return <h2>Error</h2>;
-    return (
-      <div><h2>Product List</h2>
-        <ul>
-          {data?.products.map((product, index) => (
-            <li key={index}>{JSON.stringify(product)}</li>
-          ))}
-        </ul>
-      </div>)
-  }
-  const render = () => {
-    return <>
-    <Query query={GET_USERS}>{renderContent}</Query>
-    <Query query={GET_PRODUCTS}>{renderProducts}</Query>
-    </>;
-  }
-  return render()
+  return renderCard()
 }
 
 export default App;
