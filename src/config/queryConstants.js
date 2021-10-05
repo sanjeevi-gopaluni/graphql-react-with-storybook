@@ -28,3 +28,14 @@ export const DELETE_PRODUCT = gql`
     }
   }
 `;
+export const PRODUCT_UPSERT_SUBS = gql(`
+  subscription Products {
+    productUpserted {
+      itemKey
+      desc
+      price
+      variants
+      image
+    }
+  }
+`);

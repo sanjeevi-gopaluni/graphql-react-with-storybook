@@ -28,7 +28,7 @@ MiButton.propTypes = {
   "sx": PropTypes.object,
   "variant": PropTypes.oneOf(['contained','outlined' , 'text' , 'string'])
 };
-Button.defaultProps = {
+MiButton.defaultProps = {
    
   disabled: false,
   color:'primary',
