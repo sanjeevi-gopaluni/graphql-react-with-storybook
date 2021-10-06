@@ -69,7 +69,6 @@ export default function ProductRegFrom(props) {
         setSaveStatus(false);
         createProduct({ variables: data })
     }
-    console.log("product::",product)
     const renderForm = () => {
         return <Card style={{ border: "none", boxShadow: "none" }}>
             <CardContent style={{ padding: "0px" }}>

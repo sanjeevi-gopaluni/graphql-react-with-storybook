@@ -39,3 +39,14 @@ export const PRODUCT_UPSERT_SUBS = gql(`
     }
   }
 `);
+export const PRODUCT_DELETE_SUBS = gql(`
+  subscription Products {
+    productDeleted {
+      itemKey
+      desc
+      price
+      variants
+      image
+    }
+  }
+`);

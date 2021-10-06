@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect} from "react";
 import ReactDOM from "react-dom";
 import { withStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
@@ -63,7 +63,12 @@ function ProductTileCard(props) {
   const [editFlag, setEditFlag] = React.useState(false);
   const [saveData, { data }] = useMutation(UPDATE_PRODUCT);
   const [deleteProduct, { deleteResdata }] = useMutation(DELETE_PRODUCT);
-   
+  useEffect(()=>{
+    if(product!=undefined && product!=null){
+      setPrice(product.price||'');
+      setDesc(product.desc||'');
+    }
+  },[product]) 
   const renderDesc = () => {
     if (editFlag == true) {
       return <TextField
